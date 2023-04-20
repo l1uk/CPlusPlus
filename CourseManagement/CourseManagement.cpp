@@ -249,7 +249,7 @@ void printMenu() {
               "1. Registration for a course (including querying student data). " << std::endl <<
               "    Each student has a unique email, meaning there can't be two or more students with the same email in the same course."
               << std::endl <<
-              "2. Output of one/all courses with data of the participants." << std::endl <<
+              "2. Output of all courses with data of the participants." << std::endl <<
               "    Please note that if there are fewer than 3 participants in a course, an additional message must be displayed - \"Course will not take place\"."
               << std::endl <<
               "3. Output of all courses that are not fully booked yet. " << std::endl <<
@@ -260,12 +260,14 @@ void printMenu() {
               << "Input: ";
 }
 
-
+// constructor, assigns personID
 Person::Person() {
     if (personCount >= MAX_PERSONS) { personCount = 0; }
     personID = personCount++;
 }
 
+// method for data insertion with user prompt, 
+// user email is added to the static emailsCollection[] member
 void Person::insertData(std::string em) {
     email = em;
     std::cout << "Name: ";
@@ -275,6 +277,8 @@ void Person::insertData(std::string em) {
     emailsCollection[personID] = em;
 }
 
+// method for silent data insertion 
+// user email is added to the static emailsCollection[] member
 void Person::insertData(std::string em, std::string fn, std::string sn) {
     email = em;
     firstName = fn;
@@ -282,8 +286,10 @@ void Person::insertData(std::string em, std::string fn, std::string sn) {
     emailsCollection[personID] = em;
 }
 
+// getter for email member
 std::string Person::getEmail() { return email; }
 
+// performs search in the emailsCollection array
 bool Person::personExists(std::string email) {
     for (int i = 0; i < personCount; i++)
         if (emailsCollection[i] == email)
@@ -291,52 +297,14 @@ bool Person::personExists(std::string email) {
     return false;
 }
 
-int Utils::inputInteger(int min, int max) {
-    // reading an int in a range from cin, the cin.fail() method return false when an alphanumeric string is inputted instead of a numeric value
-    // inspiration taken from https://stackoverflow.com/questions/18728754/checking-cin-input-stream-produces-an-integer
-    int x;
-    std::cin >> x;
-    while (std::cin.fail()) {
-        std::cout << "Error, please input an integer!" << std::endl << "Input: ";
-        std::cin.clear();
-        std::cin.ignore(256, '\n');
-        std::cin >> x;
-    }
-    while (x < min || x > max) {
-        std::cout << "Value out of range!" << std::endl << "Input: ";
-        std::cin.clear();
-        std::cin.ignore(256, '\n');
-        std::cin >> x;
-    }
-    return x;
-
-}
-
-bool Utils::ValidateEmail(std::string email) {
-    // code taken from https://stackoverflow.com/questions/36903985/email-validation-in-c/51007772
-    return regex_match(email, std::regex("([a-z]+)([_.a-z0-9]*)([a-z0-9]+)(@)([a-z]+)([.a-z]+)([a-z]+)"));
-}
-
-std::string Utils::inputEmail() {
-    std::cout << "Please enter your email:" << std::endl;
-    std::cout << "Email: ";
-    std::string result;
-    do {
-        std::cin >> result;
-        if (!ValidateEmail(result))
-            std::cout << "Not a valid email! Please enter again: ";
-    } while (!ValidateEmail(result));
-    return result;
-}
-
-void Utils::pauseExec() {
-    system("pause");
-}
-
+// lecturer constructor with all data members and silent insertion
 Lecturer::Lecturer(std::string em, std::string fn, std::string sn, std::string at) : academicTitle(at) {
     Person::insertData(em, fn, sn);
 }
 
+// constructor being called when instantiating the students array
+// takes care of assigning ID 
+// and populating the students array with the freshly created object
 Student::Student() : Person() {
     if (studentsCount >= MAX_STUDENTS) { studentsCount = 0; }
     studentID = studentsCount++;
@@ -477,4 +445,53 @@ void Course::showFreeToJoinCourses() {
         }
         std::cout << std::endl;
     }
+}
+
+// method for interger input
+int Utils::inputInteger(int min, int max) {
+    // reading an int in a range from cin, the cin.fail() method return false when an alphanumeric string is inputted instead of a numeric value
+    // inspiration taken from https://stackoverflow.com/questions/18728754/checking-cin-input-stream-produces-an-integer
+    int x;
+    std::cin >> x;
+    while (std::cin.fail()) {
+        std::cout << "Error, please input an integer!" << std::endl << "Input: ";
+        std::cin.clear();
+        std::cin.ignore(256, '\n');
+        std::cin >> x;
+    }
+    while (x < min || x > max) {
+        std::cout << "Value out of range!" << std::endl << "Input: ";
+        std::cin.clear();
+        std::cin.ignore(256, '\n');
+        std::cin >> x;
+    }
+    return x;
+
+}
+
+
+// method for email validation using regex
+bool Utils::ValidateEmail(std::string email) {
+    // code taken from https://stackoverflow.com/questions/36903985/email-validation-in-c/51007772
+    return regex_match(email, std::regex("([a-z]+)([_.a-z0-9]*)([a-z0-9]+)(@)([a-z]+)([.a-z]+)([a-z]+)"));
+}
+
+
+// method for email input with user prompt
+std::string Utils::inputEmail() {
+    std::cout << "Please enter your email:" << std::endl;
+    std::cout << "Email: ";
+    std::string result;
+    do {
+        std::cin >> result;
+        if (!ValidateEmail(result))
+            std::cout << "Not a valid email! Please enter again: ";
+    } while (!ValidateEmail(result));
+    return result;
+}
+
+// method for execution pause and console cleanup (platform dependent)
+void Utils::pauseExec() {
+    system("pause");
+    system("cls");
 }
