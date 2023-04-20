@@ -57,7 +57,6 @@ public:
 class Student : Person {
     // object storge is implemented within the class and its accomplished using arrays
 private:
-    int studentID; // univoque ID
     std::string matrNumber; // matriculation number
     std::string uniName; // in case student is an extern, specifies uni name
     int coursesCount; // numbers of courses the student is currently enrolled in
@@ -80,7 +79,6 @@ public:
     // STATIC MEMBERS
 
     static const int MAX_STUDENTS = 100; // maximum number of students that can be saved in the system, used to dimensionate the static storage
-    static int studentsCount; // field used for the userID
     static Student students[]; // static storage containing MAX_STUDENTS students,
     static int registeredStudents; // of which registeredStudents are "actual" Students and the rest are empty ones
 
@@ -96,7 +94,6 @@ public:
 };
 
 // static members initializations
-int Student::studentsCount = 0;
 int Student::registeredStudents = 0;
 Student Student::students[Student::MAX_STUDENTS];
 
@@ -116,11 +113,9 @@ private:
 
 public:
     // empty constructor, used to initalize the coursesArchive array
-    Course() : lecturer(), numParticipants(0) {};
+    Course();
 
-    // constructor with parameters, used in the program
     Course(std::string n, Lecturer l);
-
     // search for a student with the given email among the course participants
     bool isParticipant(std::string email);
 
@@ -143,6 +138,9 @@ public:
 
     static int coursesCount; // number of offered courses
     static Course coursesArchive[]; // static storage of Courses object
+
+    // method used to insert a new course into the archive
+    static void insertCourseData(std::string n, Lecturer l);
 
     // shows details about every course in the coursesArchive array
     static void showCourses();
@@ -188,9 +186,9 @@ int main(int argc, char *argv[]) {
     Lecturer SELecturer = Lecturer("luke.wellington@uni.it", "Luke", "Wellington", "PhD in Software engineering");
 
     // create courses & populate courses array
-    Course("Programming", progLecturer);
-    Course("Databases", DBLecturer);
-    Course("Software Engineering", SELecturer);
+    Course::insertCourseData("Programming", progLecturer);
+    Course::insertCourseData("Databases", DBLecturer);
+    Course::insertCourseData("Software Engineering", SELecturer);
 
     int choice;
     do {
@@ -305,12 +303,7 @@ Lecturer::Lecturer(std::string em, std::string fn, std::string sn, std::string a
 // constructor being called when instantiating the students array
 // takes care of assigning ID 
 // and populating the students array with the freshly created object
-Student::Student() : Person() {
-    if (studentsCount >= MAX_STUDENTS) { studentsCount = 0; }
-    studentID = studentsCount++;
-    // https://www.geeksforgeeks.org/this-pointer-in-c/
-    students[studentID] = *this;
-}
+Student::Student() : Person() {}
 
 void Student::insertData(std::string em) {
     Person::insertData(em);
@@ -331,7 +324,7 @@ std::string Student::getEmail() { return Person::getEmail(); }
 void Student::incrementCoursesCount() { coursesCount++; }
 
 void Student::showStudent() {
-    std::cout << "User ID: " << studentID << "; " << "Email: " << email << "; " <<
+    std::cout << "Email: " << email << "; " <<
               "Name: " << firstName << "; " <<
               "Surname: " << surname << "; " <<
               "Matriculation number: " << matrNumber << "; " <<
@@ -343,7 +336,7 @@ void Student::showStudent() {
 }
 
 int Student::getStudent(std::string email) {
-    for (int i = 0; i < studentsCount; i++) { if (students[i].getEmail() == email) return i; }
+    for (int i = 0; i < registeredStudents; i++) { if (students[i].getEmail() == email) return i; }
     return -1;
 }
 
@@ -353,15 +346,14 @@ int Student::registerNewStudent(std::string em) {
 }
 
 void Student::showStudent(int studentID) {
-    if (studentID >= 0 && studentID < studentsCount)
+    if (studentID >= 0 && studentID < registeredStudents)
         students[studentID].showStudent();
 }
 
 
-Course::Course(std::string n, Lecturer l) : name(n), lecturer(l), is_fully_booked(false), will_take_place(false),
-                                            numParticipants(0) {
-    if (coursesCount >= MAX_COURSES) coursesCount = 0;
-    coursesArchive[coursesCount++] = *this;
+void Course::insertCourseData(std::string n, Lecturer l) {
+    coursesArchive[coursesCount++] = Course(n,l);
+    if (coursesCount > MAX_COURSES) coursesCount = 0;
 }
 
 std::string Course::getName() { return name; }
@@ -427,7 +419,7 @@ int Course::chooseCourse() {
 
 bool Course::enrol(int courseID, int studentID) {
     if (courseID >= 0 && courseID < coursesCount)
-        if (studentID >= 0 && studentID < Student::studentsCount) {
+        if (studentID >= 0 && studentID < Student::registeredStudents) {
             if (coursesArchive[courseID].enrol(Student::students[studentID])) {
                 Student::students[studentID].incrementCoursesCount();
                 return true;
@@ -447,6 +439,12 @@ void Course::showFreeToJoinCourses() {
     }
 }
 
+Course::Course() : is_fully_booked(false), will_take_place(false),
+                   numParticipants(0) {}
+
+
+Course::Course(std::string n, Lecturer l) : name(n), lecturer(l), is_fully_booked(false), will_take_place(false),
+                                            numParticipants(0) {}
 // method for interger input
 int Utils::inputInteger(int min, int max) {
     // reading an int in a range from cin, the cin.fail() method return false when an alphanumeric string is inputted instead of a numeric value
