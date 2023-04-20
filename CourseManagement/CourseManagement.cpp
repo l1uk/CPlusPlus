@@ -131,7 +131,9 @@ public:
     // show course details
     void showCourse();
 
-    // STATIC MEMBERS
+};
+
+class CoursesArchive{
 
     static const int MAX_COURSES = 3; // maximum courses that can be saved in the system, used to dimensionate array coursesArchive
 
@@ -155,11 +157,11 @@ public:
     // call the non-static enrol() method for the specified Course object passing the student as a parameter
     // and lastly, increment the students courseCount
     static bool enrol(int courseID, int studentID);
-};
+}
 
 // static variables initializazion
-Course Course::coursesArchive[MAX_COURSES];
-int Course::coursesCount = 0;
+Course CoursesArchive::coursesArchive[MAX_COURSES];
+int CoursesArchive::coursesCount = 0;
 
 class Utils {
 // class of general purpose re-usable methods
@@ -350,12 +352,6 @@ void Student::showStudent(int studentID) {
         students[studentID].showStudent();
 }
 
-
-void Course::insertCourseData(std::string n, Lecturer l) {
-    coursesArchive[coursesCount++] = Course(n,l);
-    if (coursesCount > MAX_COURSES) coursesCount = 0;
-}
-
 std::string Course::getName() { return name; }
 
 bool Course::enrol(Student student) {
@@ -398,7 +394,13 @@ void Course::showCourse() {
     }
 }
 
-void Course::showCourses() {
+void CoursesArchive::insertCourseData(std::string n, Lecturer l) {
+    coursesArchive[coursesCount++] = Course(n,l);
+    if (coursesCount > MAX_COURSES) coursesCount = 0;
+}
+
+
+void CoursesArchive::showCourses() {
     std::cout << "Courses list:" << std::endl << std::endl;
     for (int i = 0; i < coursesCount; i++) {
         std::cout << "Course " << i + 1 << std::endl << "     ";
@@ -407,7 +409,7 @@ void Course::showCourses() {
     }
 }
 
-int Course::chooseCourse() {
+int CoursesArchive::chooseCourse() {
     std::cout << "Please choose a course from the list:" << std::endl;
     for (int i = 0; i < coursesCount; i++) {
         std::cout << i + 1 << ". Course Name: " << coursesArchive[i].getName() << std::endl;
@@ -417,7 +419,7 @@ int Course::chooseCourse() {
     return choice - 1;
 }
 
-bool Course::enrol(int courseID, int studentID) {
+bool CoursesArchive::enrol(int courseID, int studentID) {
     if (courseID >= 0 && courseID < coursesCount)
         if (studentID >= 0 && studentID < Student::registeredStudents) {
             if (coursesArchive[courseID].enrol(Student::students[studentID])) {
@@ -428,7 +430,7 @@ bool Course::enrol(int courseID, int studentID) {
     return false;
 }
 
-void Course::showFreeToJoinCourses() {
+void CoursesArchive::showFreeToJoinCourses() {
     std::cout << "Free to join courses list:" << std::endl << std::endl;
     for (int i = 0; i < coursesCount; i++) {
         if (!coursesArchive[i].is_fully_booked) {
