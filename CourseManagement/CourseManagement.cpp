@@ -42,7 +42,7 @@ public:
 int Person::personCount = 0;
 std::string Person::emailsCollection[MAX_PERSONS];
 
-class Lecturer : Person {
+molclass Lecturer : public Person {
 private:
     std::string academicTitle;
 public:
@@ -51,11 +51,12 @@ public:
 
     // construtor with parameters
     Lecturer(std::string em, std::string fn, std::string sn, std::string at);
+
+    void showLecturer(); // show lecturer details
 };
 
 
 class Student : Person {
-    // object storge is implemented within the class and its accomplished using arrays
 private:
     std::string matrNumber; // matriculation number
     std::string uniName; // in case student is an extern, specifies uni name
@@ -75,9 +76,10 @@ public:
     void incrementCoursesCount(); // setter for coursesCount, called after course enrolment
 
     std::string getEmail(); // getter for email
+};
 
-    // STATIC MEMBERS
-
+class StudentArchive {
+public:
     static const int MAX_STUDENTS = 100; // maximum number of students that can be saved in the system, used to dimensionate the static storage
     static Student students[]; // static storage containing MAX_STUDENTS students,
     static int registeredStudents; // of which registeredStudents are "actual" Students and the rest are empty ones
@@ -94,10 +96,12 @@ public:
 };
 
 // static members initializations
-int Student::registeredStudents = 0;
-Student Student::students[Student::MAX_STUDENTS];
+int StudentArchive::registeredStudents = 0;
+Student StudentArchive::students[StudentArchive::MAX_STUDENTS];
 
 class Course {
+    friend class CoursesArchive;
+
 private:
     // Static constants
     static const int MAX_PARTICIPANTS = 10; // course maximum capacity
@@ -110,12 +114,12 @@ private:
     // booleans indicating the course state, updated when a student enrol
     bool is_fully_booked;
     bool will_take_place;
-
 public:
     // empty constructor, used to initalize the coursesArchive array
     Course();
 
     Course(std::string n, Lecturer l);
+
     // search for a student with the given email among the course participants
     bool isParticipant(std::string email);
 
@@ -128,13 +132,17 @@ public:
     // getter for the name attribute
     std::string getName();
 
+    // getter for the will_take_place attrbiute
+    bool willTakePlace();
+
     // show course details
     void showCourse();
 
+
 };
 
-class CoursesArchive{
-
+class CoursesArchive {
+public:
     static const int MAX_COURSES = 3; // maximum courses that can be saved in the system, used to dimensionate array coursesArchive
 
 
@@ -157,10 +165,16 @@ class CoursesArchive{
     // call the non-static enrol() method for the specified Course object passing the student as a parameter
     // and lastly, increment the students courseCount
     static bool enrol(int courseID, int studentID);
-}
+
+
+    // display for each course that will not take place, the names of the people to be notified
+    static void notifyCoursesNotTakingPlace();
+};
 
 // static variables initializazion
-Course CoursesArchive::coursesArchive[MAX_COURSES];
+Course
+
+        CoursesArchive::coursesArchive[MAX_COURSES];
 int CoursesArchive::coursesCount = 0;
 
 class Utils {
@@ -177,6 +191,8 @@ public:
 
     // method to pause execution and clear the screen (platform-dependent)
     static void pauseExec();
+
+    static bool stringInArray(std::string stringToSearch, std::string stringArray[], int arrayLength);
 };
 
 void printMenu();
@@ -188,9 +204,9 @@ int main(int argc, char *argv[]) {
     Lecturer SELecturer = Lecturer("luke.wellington@uni.it", "Luke", "Wellington", "PhD in Software engineering");
 
     // create courses & populate courses array
-    Course::insertCourseData("Programming", progLecturer);
-    Course::insertCourseData("Databases", DBLecturer);
-    Course::insertCourseData("Software Engineering", SELecturer);
+    CoursesArchive::insertCourseData("Programming", progLecturer);
+    CoursesArchive::insertCourseData("Databases", DBLecturer);
+    CoursesArchive::insertCourseData("Software Engineering", SELecturer);
 
     int choice;
     do {
@@ -200,19 +216,19 @@ int main(int argc, char *argv[]) {
         switch (choice) {
             case 1: {
                 // prompt the user to choose a course and store the index in a variable
-                int courseID = Course::chooseCourse();
+                int courseID = CoursesArchive::chooseCourse();
                 // input user email
                 std::string email = Utils::inputEmail();
                 // search for existing user (could be a lecturer) with the given email
                 bool personExists = Person::personExists(email);
                 // search for existing student with that email
-                int studentID = Student::getStudent(email);
+                int studentID = StudentArchive::getStudent(email);
                 if (personExists) {
                     // user exists
                     if (studentID != -1) {
                         // user already registered as a student, the ID of it is stored in the studentID variable
                         std::cout << "User already registered" << std::endl;
-                        Student::showStudent(studentID);
+                        StudentArchive::showStudent(studentID);
                     } else {
                         // user exists but its a lecturer, aborting the enrolment procedure
                         std::cout << "Lecturer cannot join courses!" << std::endl;
@@ -220,25 +236,30 @@ int main(int argc, char *argv[]) {
                     }
                 } else {
                     // user does not exists, create new
-                    studentID = Student::registerNewStudent(email);
+                    studentID = StudentArchive::registerNewStudent(email);
                 }
 
                 // enrol the chosen student in the chosen course
-                Course::enrol(courseID, studentID);
+                CoursesArchive::enrol(courseID, studentID);
                 break;
             }
             case 2: {
-                Course::showCourses();
+                CoursesArchive::showCourses();
                 break;
             }
             case 3: {
-                Course::showFreeToJoinCourses();
+                CoursesArchive::showFreeToJoinCourses();
                 break;
             }
         }
         Utils::pauseExec();
     } while (choice != 4);
 
+    CoursesArchive::notifyCoursesNotTakingPlace();
+
+    Utils::pauseExec();
+
+    return 0;
 
 }
 
@@ -302,6 +323,13 @@ Lecturer::Lecturer(std::string em, std::string fn, std::string sn, std::string a
     Person::insertData(em, fn, sn);
 }
 
+void Lecturer::showLecturer() {
+    std::cout << "Email: " << email << "; " <<
+              "Name: " << firstName << "; " <<
+              "Surname: " << surname << "; " <<
+              "Academic title: " << academicTitle << "; " << std::endl;
+}
+
 // constructor being called when instantiating the students array
 // takes care of assigning ID 
 // and populating the students array with the freshly created object
@@ -337,17 +365,17 @@ void Student::showStudent() {
     std::cout << std::endl;
 }
 
-int Student::getStudent(std::string email) {
+int StudentArchive::getStudent(std::string email) {
     for (int i = 0; i < registeredStudents; i++) { if (students[i].getEmail() == email) return i; }
     return -1;
 }
 
-int Student::registerNewStudent(std::string em) {
+int StudentArchive::registerNewStudent(std::string em) {
     students[registeredStudents].insertData(em);
     return registeredStudents++;
 }
 
-void Student::showStudent(int studentID) {
+void StudentArchive::showStudent(int studentID) {
     if (studentID >= 0 && studentID < registeredStudents)
         students[studentID].showStudent();
 }
@@ -384,9 +412,9 @@ void Course::showCourse() {
     std::cout << "Name: " << name << "; Participants: " << numParticipants << "/" << MAX_PARTICIPANTS << std::endl;
     for (int i = 0; i < numParticipants; i++) {
         if (!participantsEmails[i].empty()) {
-            int studentIndex = Student::getStudent(participantsEmails[i]);
+            int studentIndex = StudentArchive::getStudent(participantsEmails[i]);
             std::cout << "          " << i + 1 << ". ";
-            Student::students[studentIndex].showStudent();
+            StudentArchive::students[studentIndex].showStudent();
         }
     }
     if (!will_take_place) {
@@ -395,7 +423,7 @@ void Course::showCourse() {
 }
 
 void CoursesArchive::insertCourseData(std::string n, Lecturer l) {
-    coursesArchive[coursesCount++] = Course(n,l);
+    coursesArchive[coursesCount++] = Course(n, l);
     if (coursesCount > MAX_COURSES) coursesCount = 0;
 }
 
@@ -421,9 +449,9 @@ int CoursesArchive::chooseCourse() {
 
 bool CoursesArchive::enrol(int courseID, int studentID) {
     if (courseID >= 0 && courseID < coursesCount)
-        if (studentID >= 0 && studentID < Student::registeredStudents) {
-            if (coursesArchive[courseID].enrol(Student::students[studentID])) {
-                Student::students[studentID].incrementCoursesCount();
+        if (studentID >= 0 && studentID < StudentArchive::registeredStudents) {
+            if (coursesArchive[courseID].enrol(StudentArchive::students[studentID])) {
+                StudentArchive::students[studentID].incrementCoursesCount();
                 return true;
             }
         }
@@ -433,11 +461,41 @@ bool CoursesArchive::enrol(int courseID, int studentID) {
 void CoursesArchive::showFreeToJoinCourses() {
     std::cout << "Free to join courses list:" << std::endl << std::endl;
     for (int i = 0; i < coursesCount; i++) {
-        if (!coursesArchive[i].is_fully_booked) {
+        if (!coursesArchive[i].isFullyBooked()) {
             std::cout << "Course " << i + 1 << std::endl << "     ";
             coursesArchive[i].showCourse();
         }
         std::cout << std::endl;
+    }
+}
+
+// nested iterations over courses and students
+// an array with the emails of the already notified people is used to ensure not to notify someone twice
+void CoursesArchive::notifyCoursesNotTakingPlace() {
+    std::cout << "WARNING - notify these people that the courses they signed up for, or that they will hold won't take place:" << std::endl
+              << std::endl;
+
+    std::string emailsToNotify[Person::MAX_PERSONS];
+    int numberToNotify = 0;
+
+    for (int i = 0; i < coursesCount; i++) {
+        if (!coursesArchive[i].willTakePlace()) {
+            if (!Utils::stringInArray(
+                    coursesArchive[i].lecturer.getEmail(), emailsToNotify, numberToNotify)
+                || numberToNotify == 0) {
+                emailsToNotify[numberToNotify++] = coursesArchive[i].lecturer.getEmail();
+                coursesArchive[i].lecturer.showLecturer();
+            }
+            for (int j = 0; j < coursesArchive[i].numParticipants; j++) {
+                if (!Utils::stringInArray(coursesArchive[i].participantsEmails[j], emailsToNotify, numberToNotify)) {
+                    emailsToNotify[numberToNotify++] = coursesArchive[i].participantsEmails[j];
+                    StudentArchive::showStudent(
+                            StudentArchive::getStudent(coursesArchive[i].participantsEmails[j])
+                    );
+                }
+            }
+
+        }
     }
 }
 
@@ -447,6 +505,9 @@ Course::Course() : is_fully_booked(false), will_take_place(false),
 
 Course::Course(std::string n, Lecturer l) : name(n), lecturer(l), is_fully_booked(false), will_take_place(false),
                                             numParticipants(0) {}
+
+bool Course::willTakePlace() { return will_take_place; }
+
 // method for interger input
 int Utils::inputInteger(int min, int max) {
     // reading an int in a range from cin, the cin.fail() method return false when an alphanumeric string is inputted instead of a numeric value
@@ -494,4 +555,13 @@ std::string Utils::inputEmail() {
 void Utils::pauseExec() {
     system("pause");
     system("cls");
+}
+
+// search for string in array
+bool Utils::stringInArray(std::string stringToSearch, std::string stringArray[], int arrayLength) {
+    for (int i = 0; i < arrayLength; i++) {
+        if (stringArray[i] == stringToSearch)
+            return true;
+    }
+    return false;
 }
