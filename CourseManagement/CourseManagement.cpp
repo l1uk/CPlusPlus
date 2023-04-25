@@ -42,14 +42,14 @@ public:
 int Person::personCount = 0;
 std::string Person::emailsCollection[MAX_PERSONS];
 
-molclass Lecturer : public Person {
+class Lecturer : public Person {
 private:
     std::string academicTitle;
 public:
-    //empty constructor, necessary for the Course class to initialize the lecturer attribute
+//empty constructor, necessary for the Course class to initialize the lecturer attribute
     Lecturer() {};
 
-    // construtor with parameters
+// construtor with parameters
     Lecturer(std::string em, std::string fn, std::string sn, std::string at);
 
     void showLecturer(); // show lecturer details
@@ -265,7 +265,7 @@ int main(int argc, char *argv[]) {
 
 
 void printMenu() {
-    std::cout << "Welcome to the Main Menu, at the moment there are " << std::endl << std::endl << "Commands:"
+    std::cout << "Welcome to the Main Menu, options: " << std::endl << std::endl << "Commands:"
               << std::endl <<
               "1. Registration for a course (including querying student data). " << std::endl <<
               "    Each student has a unique email, meaning there can't be two or more students with the same email in the same course."
@@ -287,7 +287,7 @@ Person::Person() {
     personID = personCount++;
 }
 
-// method for data insertion with user prompt, 
+// method for data insertion with user prompt,
 // user email is added to the static emailsCollection[] member
 void Person::insertData(std::string em) {
     email = em;
@@ -298,7 +298,7 @@ void Person::insertData(std::string em) {
     emailsCollection[personID] = em;
 }
 
-// method for silent data insertion 
+// method for silent data insertion
 // user email is added to the static emailsCollection[] member
 void Person::insertData(std::string em, std::string fn, std::string sn) {
     email = em;
@@ -331,7 +331,7 @@ void Lecturer::showLecturer() {
 }
 
 // constructor being called when instantiating the students array
-// takes care of assigning ID 
+// takes care of assigning ID
 // and populating the students array with the freshly created object
 Student::Student() : Person() {}
 
@@ -472,8 +472,10 @@ void CoursesArchive::showFreeToJoinCourses() {
 // nested iterations over courses and students
 // an array with the emails of the already notified people is used to ensure not to notify someone twice
 void CoursesArchive::notifyCoursesNotTakingPlace() {
-    std::cout << "WARNING - notify these people that the courses they signed up for, or that they will hold won't take place:" << std::endl
-              << std::endl;
+    std::cout
+            << "WARNING - notify these people that the courses they signed up for, or that they will hold won't take place:"
+            << std::endl
+            << std::endl;
 
     std::string emailsToNotify[Person::MAX_PERSONS];
     int numberToNotify = 0;
