@@ -1,0 +1,4 @@
+
+Create a text file with any content.
+Then read the content of the file and display the single lines in the console.
+Enter the line number for each line.

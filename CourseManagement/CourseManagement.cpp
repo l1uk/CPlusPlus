@@ -197,7 +197,7 @@ public:
 
 void printMenu();
 
-int main(int argc, char *argv[]) {
+int courseManagement() {
     // create lecturers
     Lecturer progLecturer = Lecturer("john.white@uni.us", "John", "White", "CS Bachelor");
     Lecturer DBLecturer = Lecturer("walt.obama@uni.de", "Walter", "Obama", "Computer Engineering Bachelor");
