@@ -1,6 +1,6 @@
-#include "Files/textFile.h"
+#include "Pointers/Pointers.h"
 #include "CourseManagement/CourseManagement.h"
 int main(int argc, char *argv[]){
-    employee();
+    courseManagement();
     return 0;
 }

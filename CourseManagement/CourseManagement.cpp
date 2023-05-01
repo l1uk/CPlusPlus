@@ -27,7 +27,7 @@ public:
     // STATIC MEMBERS
 
     // max persons that can be saved in the system, used to dimensionate the collection
-    static const int MAX_PERSONS = 100;
+    static const int MAX_PERSONS = 150;
     // number of people currently saved in the system, used to generate personID
     static int personCount;
     // collection of registered users emails
@@ -236,6 +236,10 @@ int courseManagement() {
                     }
                 } else {
                     // user does not exists, create new
+                    if( StudentArchive::registeredStudents >= StudentArchive::MAX_STUDENTS ){
+                        std::cout << "Error! Max numbers of people reached! Please contact the system admin." << std::endl;
+                        break;
+                    }
                     studentID = StudentArchive::registerNewStudent(email);
                 }
 
