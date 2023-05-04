@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <cstdlib>
+#include "../Utils/Utils.h"
 
 using namespace std;
 
@@ -10,12 +11,6 @@ void printElements(string[], float[], int);
 
 //method that sorts the shopping list by price
 void sortElementsByPrice(string[], float[], int);
-
-//method that prompts the user for an integer ranging from min to max
-int inputInteger(int, int);
-
-//method that prompts the user for a positive float
-float inputFloat();
 
 int muin(int argc, char *argv[]) {
 
@@ -42,7 +37,7 @@ int muin(int argc, char *argv[]) {
              "1 to create a new item" << endl << "2 to show available items"
              << endl << "3 to sort items by price" << endl << "4 to exit" << endl << endl << "Input: ";
 
-        choice = inputInteger(1, 4);
+        choice = inputInt(1, 4);
 
         switch (choice) {
             case 1:
@@ -83,19 +78,6 @@ int muin(int argc, char *argv[]) {
     return 0;
 }
 
-float inputFloat() {
-    // reading a float from cin, the cin.fail() method return false when an alphanumeric string is inputted instead of a numeric value
-    // inspiration taken from https://stackoverflow.com/questions/18728754/checking-cin-input-stream-produces-an-integer
-    float x;
-    cin >> x;
-    while (cin.fail() || x <= 0) {
-        cout << "Error, please input a positive Float value!" << endl << "Input: ";
-        cin.clear();
-        cin.ignore(256, '\n');
-        cin >> x;
-    }
-    return x;
-}
 
 int inputInteger(int min, int max) {
     // reading a int in a range from cin, the cin.fail() method return false when an alphanumeric string is inputted instead of a numeric value
