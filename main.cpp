@@ -3,8 +3,10 @@
 #include "dynamicMemory/dynamicArray.h"
 #include "SingleLinkedLists/peopleHandling.h"
 #include "ShoppingList/ShoppingList.h"
+#include "Polymorphism/Polygon.h"
+#include "OperatorOverloading/Overloading.h"
 
 int main(int argc, char *argv[]) {
-    shoppingList();
+    rockPaperScrissors();
     return 0;
 }
