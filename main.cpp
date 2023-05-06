@@ -5,8 +5,9 @@
 #include "ShoppingList/ShoppingList.h"
 #include "Polymorphism/Polygon.h"
 #include "OperatorOverloading/Overloading.h"
+#include "Templates/Templates.h"
 
 int main(int argc, char *argv[]) {
-    rockPaperScrissors();
+    sortEx();
     return 0;
 }
