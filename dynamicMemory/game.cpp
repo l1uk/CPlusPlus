@@ -2,7 +2,7 @@
 //A player is to fight a total of 3 monsters to find a treasure.
 //
 //Create a class "Creature" that has the data members "healthPoints" and "damage".
-//Create a subclass "Player" that additionally has the data member "potionOfLife".
+//Create a subclass "Gamer" that additionally has the data member "potionOfLife".
 //
 //The player has 100 life points at the beginning and one potion to use.
 //
@@ -65,11 +65,11 @@ public:
     int getHP() { return healthPoints; }
 };
 
-class Player : public Creature {
+class Gamer : public Creature {
 private:
     int potionOfLife;
 public:
-    Player() : Creature(100), potionOfLife(1) {}
+    Gamer() : Creature(100), potionOfLife(1) {}
 
     int getPotionOfLife() {
         return potionOfLife;
@@ -92,7 +92,7 @@ public:
 
 int game() {
     srand(time(NULL));
-    Player *p = new Player();
+    Gamer *p = new Gamer();
     int choice, creaturesDefeated = 0;
     do {
         cout << "1. fight, 2. cure (" << p->getPotionOfLife() << " available), 3. exit" << endl
@@ -118,9 +118,9 @@ int game() {
                         break;
                     }
                     // then monster attacks
-                    cout << "Player HP before attack: " << p->getHP() << endl;
+                    cout << "Gamer HP before attack: " << p->getHP() << endl;
                     c->attack(p);
-                    cout << "Player HP after attack: " << p->getHP() << endl;
+                    cout << "Gamer HP after attack: " << p->getHP() << endl;
                     // if player dead, exit while
                     if (p->getHP() < 1) break;
                 }
@@ -138,7 +138,7 @@ int game() {
 
         }
         if (p->getHP() < 1) {
-            cout << "Player is dead, thanks for playing!" << endl << "Defeated creatures: " << creaturesDefeated
+            cout << "Gamer is dead, thanks for playing!" << endl << "Defeated creatures: " << creaturesDefeated
                  << endl;
             break;
         }

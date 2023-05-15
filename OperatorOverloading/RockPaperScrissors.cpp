@@ -3,34 +3,34 @@
 
 using namespace std;
 
-class Player {
+class Gamer {
 private:
     string name;
     int selection, numWins, numDraw;
 public:
-    Player(string name) : name(name), selection(0), numDraw(0), numWins(0) {}
+    Gamer(string name) : name(name), selection(0), numDraw(0), numWins(0) {}
 
     void setSelection(int selection) {
-        Player::selection = selection;
+        Gamer::selection = selection;
     }
 
-    bool operator==(Player p) {
+    bool operator==(Gamer p) {
         return this->selection == p.selection;
     }
 
     // prefix operator for number of draws
-    Player &operator++() {
+    Gamer &operator++() {
         numDraw++;
         return *this;
     }
 
     //postfix operator for number of wins
-    Player operator++(int) {
+    Gamer operator++(int) {
         this->numWins++;
         return *this;
     }
 
-    bool operator>(Player p) {
+    bool operator>(Gamer p) {
         return (
                 (this->selection == 0 && p.selection == 2) ||
                 (this->selection == 1 && p.selection == 0) ||
@@ -38,19 +38,19 @@ public:
         );
     }
 
-    bool operator>=(Player p) {
+    bool operator>=(Gamer p) {
         return (this->numWins > p.numWins);
     }
 
-    friend istream &operator>>(istream &is, Player &p) {
+    friend istream &operator>>(istream &is, Gamer &p) {
 
         p.selection = inputInt(0, 2);
         return is;
     }
 
-    friend ostream &operator<<(ostream &os, Player &p) {
+    friend ostream &operator<<(ostream &os, Gamer &p) {
 
-        cout << "Player: " << p.name << ", Number of wins " << p.numWins << endl;
+        cout << "Gamer: " << p.name << ", Number of wins " << p.numWins << endl;
         return os;
     }
 };
@@ -59,8 +59,8 @@ int rockPaperScrissors() {
 
     const int maxMoves = 5;
 
-    Player p = Player("Player");
-    Player *c = new Player("Computer");
+    Gamer p = Gamer("Gamer");
+    Gamer *c = new Gamer("Computer");
 
     int numMoves = 0, choice;
 
@@ -68,7 +68,7 @@ int rockPaperScrissors() {
         cout << "[0] Scissors\n"
                 "[1] Rock\n"
                 "[2] Paper\n"
-                "Selection Player:";
+                "Selection Gamer:";
         cin >> p;
         c->setSelection(getRandomNumber(0, 2));
         // if player and computer made the same choice, increment their draw count
@@ -84,7 +84,7 @@ int rockPaperScrissors() {
     }
 
     if (p >= *c) {
-        cout << "Player has won!" << endl;
+        cout << "Gamer has won!" << endl;
     } else if (*c >= p) { cout << "Computer has won!" << endl; }
     else { cout << "Draw!!" << endl; }
 

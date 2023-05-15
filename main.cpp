@@ -6,8 +6,11 @@
 #include "Polymorphism/Polygon.h"
 #include "OperatorOverloading/Overloading.h"
 #include "Templates/Templates.h"
+#include "CombatGame/combatGame.h"
+#include "AdvancedCPP/AdvancedCPP.h"
 
 int main(int argc, char *argv[]) {
-    sortEx();
+    combatGame();
+    //uniformInitialization();
     return 0;
 }
