@@ -4,7 +4,7 @@
 //Create a class "Creature" that has the data members "healthPoints" and "damage".
 //Create a subclass "Gamer" that additionally has the data member "potionOfLife".
 //
-//The player has 100 life points at the beginning and one potion to use.
+//The player has 100 life totalPoints at the beginning and one potion to use.
 //
 //A menu is to appear which always displays the player's current healthPoints.
 //The following options are available:

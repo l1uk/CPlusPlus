@@ -590,6 +590,7 @@ void Utils::pauseExec() {
     system("cls");
 }
 
+
 // search for string in array
 bool Utils::stringInArray(string stringToSearch, string stringArray[], int arrayLength) {
     for (int i = 0; i < arrayLength; i++) {
