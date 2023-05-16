@@ -11,6 +11,6 @@
 
 int main(int argc, char *argv[]) {
     combatGame();
-    //uniformInitialization();
+    //copyControl();
     return 0;
 }
