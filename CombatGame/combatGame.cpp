@@ -167,7 +167,6 @@ public:
         cout << "Welcome to the battle!" << endl;
         bool ended = false;
         while (!ended) {
-            // TODO: implement logic for the user to quit
             Player *fighter1, *fighter2;
             list<Player *> players;
             players.assign(&this->players[0],
@@ -177,7 +176,7 @@ public:
                     std::count_if(players.begin(), players.end(),
                                   Player::canPlay); // I.E. that not have been playing the maximum number of battles
 
-            if (players_that_can_play < 2) {
+            if (players_that_can_play < 2) { // there should at least be 2 players that can join a fight
                 cout << "Game over! There are non more players available at the moment." << endl <<
                      "  Note that the maximum number of rounds per player is " << Player::MAX_FIGHTS << endl << endl;
                 Utilities::pauseExec();
@@ -209,6 +208,18 @@ public:
             cout << f << endl;
 
             Utilities::pauseExec();
+            cout << "Next game(0) or quit(1)?: "; // prompting the user whether to quit or go on
+            ended = Utilities::input_int(0, 1);
+        }
+        Player tmp;
+        for (int i = NUM_PLAYERS - 1; i >= 0; i--) { // sort the players based on score
+            for (int j = 0; j < i; j++) {
+                if (this->players[i]->getCurrentGamePoints() > this->players[j]->getCurrentGamePoints()) {
+                    tmp = *this->players[i];
+                    *this->players[i] = *this->players[j];
+                    *this->players[j] = tmp;
+                }
+            }
         }
     }
 
@@ -234,13 +245,14 @@ void copyObjectReferences(list<Player> &sourceList,
                           list<Player *> &destinationList);
 
 int combatGame() {
-    cout
-            << "Welcome to Combat Game Management! Do you want to work with persistent storage? Please check and adjust the file path accordingly to your needs"
-            << endl <<
-            "1 = yes, 0 = no:  ";
-    bool fileHandling = Utilities::input_int(0, 1); // this boolean determines wheter the players will be saved or not
     filesystem::path fileName =
             filesystem::current_path().parent_path() / "CombatGame" / "combatGame.dat"; // change file path if necessary
+    cout
+            << "Welcome to Combat Game Management! Do you want to work with persistent storage? Please check and adjust the file path accordingly to your needs"
+            << endl << "Current path: " << fileName << endl <<
+            "1 = yes, 0 = no:  ";
+    bool fileHandling = Utilities::input_int(0, 1); // this boolean determines wheter the players will be saved or not
+
 
     list<Player> playersList;
 
@@ -262,7 +274,26 @@ int combatGame() {
         switch (choice) {
             case 1: { // create new player and push it in the players' list
                 system("cls");
-                cin >> p; // input player
+                int duplicates;
+                do { // the player needs to have an univoque number, so repeat the input until the number is not already found in the players list
+                    cin >> p; // input player
+
+                    // inspiration taken from https://stackoverflow.com/questions/42933943/how-to-use-lambda-for-stdfind-if
+                    // (using lambda for this use case is necessary because we need to capture p variable)
+                    duplicates = std::count_if(playersList.begin(),
+                                               playersList.end(), // count the occurance of players with the same number as the one just inserted
+                                               [&p](const Player &x) {
+                                                   return p.getNumber() ==
+                                                          x.getNumber(); // returns true if the current player (in the list) has the same number as the p parameter (just inserted)
+                                               });
+                    if (duplicates != 0) { // there should be 0 players with the same number
+                        cout
+                                << "Attention! There is another player with the same player Number!! Please input the player's data again"
+                                << endl;
+                    }
+
+                } while (duplicates != 0);
+
                 playersList.push_back(p); // push it into the players list
                 cout << endl;
                 Utilities::pauseExec();
@@ -281,7 +312,6 @@ int combatGame() {
                             tempList);  // across all the program
 
                     for (int i = 0; i < Game::NUM_PLAYERS; i++) {
-                        cout << "Choose player " << i + 1 << endl;
                         players[i] = Player::choosePlayerFromList(tempList,
                                                                   ("Choose player " + to_string(i + 1)));
                         tempList.remove(players[i]); // players get removed once chosen
@@ -312,7 +342,7 @@ int combatGame() {
 
 
                 cout << *maxPlayer << endl;
-
+                Utilities::pauseExec();
                 break;
             }
             default: {
@@ -325,13 +355,30 @@ int combatGame() {
         try { Player::saveFile(playersList, fileName); }
         catch (string &ex) {
             cout << ex << endl;
-            return 0;
+            return -1;
         }
 
     return 0;
 }
 
+void menu() {
+    cout << "1. Create player - the recording of data is to be done via istream (>>) operator overloading\n"
+            "\n"
+            "\n"
+            "2. Manage combat game (here you enter the players and the results. The totalPoints are awarded dynamically) - after entering the combat data, the winner of the game will be displayed.\n"
+            "Operator overloading >= checks, for example, whether the winner was taller and/or heavier than the loser and outputs the determined result, e.g. Player John Doe has won, he is 2 cm taller (shorter) and 7.6 kg heavier (lighter) than player Bob Smith\n"
+            "\n"
+            "\n"
+            "3. Output of all players - the output of the data has to be done via ostream (<<) operator overloading: e.g. John Doe, 1978, 178cm, 88kg, participated in 2 combat games: 1 x won, 1 x tie = 15 totalPoints\n\n"
+            "4. Output winner (Player that currently has more points)"
+            "\n"
+            "\n"
+            "5. Program exit" << endl; // copied and pasted from the assignment text
+}
+
+// copy a list of objects (first arg) to a list of references to those objects (second arg)
 void copyObjectReferences(list<Player> &sourceList, list<Player *> &destinationList) {
+    destinationList.clear();
     list<Player>::iterator it = sourceList.begin();
     do {
         destinationList.push_front(&(*it)); // push the address of the current element in the destinationList
@@ -369,21 +416,6 @@ int Utilities::input_int(int min, int max) {
     }
     return x;
 
-}
-
-void menu() {
-    cout << "1. Create player - the recording of data is to be done via istream (>>) operator overloading\n"
-            "\n"
-            "\n"
-            "2. Manage combat game (here you enter the players and the results. The totalPoints are awarded dynamically) - after entering the combat data, the winner of the game will be displayed.\n"
-            "Operator overloading >= checks, for example, whether the winner was taller and/or heavier than the loser and outputs the determined result, e.g. Player John Doe has won, he is 2 cm taller (shorter) and 7.6 kg heavier (lighter) than player Bob Smith\n"
-            "\n"
-            "\n"
-            "3. Output of all players - the output of the data has to be done via ostream (<<) operator overloading: e.g. John Doe, 1978, 178cm, 88kg, participated in 2 combat games: 1 x won, 1 x tie = 15 totalPoints\n\n"
-            "4. Output winner (Player that currently has more points)"
-            "\n"
-            "\n"
-            "5. Program exit" << endl; // copied and pasted from the assignment text
 }
 
 void Player::saveFile(list<Player> &playersList, const filesystem::path &fileName) {
@@ -429,21 +461,20 @@ ostream &operator<<(ostream &os, Player &p) {
 
 
 istream &operator>>(istream &is, Player &p) {
-    // TODO: control on univoque player number
     cout << "Insert number: ";
-    p.number = Utilities::input_int(0, 100);
+    p.number = Utilities::input_int(0, numeric_limits<int>::max());
     cout << "Insert name: ";
     cin >> p.name;
     cout << "Insert surname: ";
     cin >> p.surname;
     cout << "Insert height in cm: ";
-    p.height = Utilities::input_int(0, 1000);
+    p.height = Utilities::input_int(0, numeric_limits<int>::max());
     cout << "Insert weight in Kg: ";
-    p.weight = Utilities::input_int(0, 1000);
-    cout << "Insert totalPoints: ";
-    p.totalPoints = Utilities::input_int(0, 3000);
+    p.weight = Utilities::input_int(0, numeric_limits<int>::max());
+    cout << "Insert total Points: ";
+    p.totalPoints = Utilities::input_int(0, numeric_limits<int>::max());
     cout << "Insert birth year: ";
-    p.yearOfBirth = Utilities::input_int(0, 3000);
+    p.yearOfBirth = Utilities::input_int(0, numeric_limits<int>::max());
     return is;
 }
 
@@ -540,7 +571,6 @@ int Player::getCurrentGamePoints() const {
 bool Player::b_has_greaterPoints(Player a, Player b) {
     // inspiration taken from https://www.geeksforgeeks.org/stdmin-in-cpp/
     return a.getTotalPoints() < b.getTotalPoints();
-
 }
 
 
