@@ -142,8 +142,8 @@ int game() {
                  << endl;
             break;
         }
-        if(creaturesDefeated == 3){
-            if(p->hasLifePotion()) cout << "You are a true hero!!" << endl;
+        if (creaturesDefeated == 3) {
+            if (p->hasLifePotion()) cout << "You are a true hero!!" << endl;
             else cout << "You have found a treasure!" << endl;
             break;
         }

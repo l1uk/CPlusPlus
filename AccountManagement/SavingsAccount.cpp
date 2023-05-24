@@ -8,7 +8,8 @@ SavingsAccount::SavingsAccount() : Account() {
 
 }
 
-SavingsAccount::SavingsAccount(float balance, float initialIterestRate) : Account(balance), interestRate(initialIterestRate) {
+SavingsAccount::SavingsAccount(float balance, float initialIterestRate) : Account(balance),
+                                                                          interestRate(initialIterestRate) {
 }
 
 SavingsAccount::SavingsAccount(float initialIterestRate) : Account(), interestRate(initialIterestRate) {

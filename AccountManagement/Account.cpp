@@ -6,7 +6,7 @@
 
 int Account::accountsCount = 0;
 
-Account::Account(){
+Account::Account() {
     accountsCount++;
     accountNumber = accountsCount;
 }
@@ -27,7 +27,7 @@ float Account::getBalance() {
 
 bool Account::withdraw(float amount) {
     float newBalance = balance - amount;
-    if( newBalance < 0 ){ return false; }
+    if (newBalance < 0) { return false; }
     balance = newBalance;
     return true;
 }

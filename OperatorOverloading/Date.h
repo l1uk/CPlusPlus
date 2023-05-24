@@ -17,6 +17,7 @@ private:
     int day, month, year;
 
     friend istream &operator>>(istream &is, Date &b);
+
     friend ostream &operator<<(ostream &os, Date &b);
 
     static int getMaxDay(int month);

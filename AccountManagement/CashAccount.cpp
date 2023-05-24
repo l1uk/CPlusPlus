@@ -4,7 +4,7 @@
 
 #include "CashAccount.h"
 
-CashAccount::CashAccount() : Account(){
+CashAccount::CashAccount() : Account() {
 
 }
 
@@ -12,7 +12,8 @@ CashAccount::CashAccount(float initialBalance) : Account(initialBalance) {
 
 }
 
-CashAccount::CashAccount(float initialBalance, float initialWithdrawLimit) :  Account(initialBalance), withdrawLimit(initialWithdrawLimit){
+CashAccount::CashAccount(float initialBalance, float initialWithdrawLimit) : Account(initialBalance),
+                                                                             withdrawLimit(initialWithdrawLimit) {
 
 }
 
@@ -21,7 +22,7 @@ void CashAccount::setWithdrawLimit(float newLimit) {
 }
 
 bool CashAccount::withdraw(float amount) {
-    if(amount <= withdrawLimit)
+    if (amount <= withdrawLimit)
         return Account::withdraw(amount);
     return false;
 }

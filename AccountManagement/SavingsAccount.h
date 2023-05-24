@@ -8,16 +8,21 @@
 
 #include "Account.h"
 
-class SavingsAccount : Account{
+class SavingsAccount : Account {
 private:
     float interestRate;
 
 public:
     SavingsAccount();
+
     SavingsAccount(float balance, float initialIterestRate);
+
     SavingsAccount(float initialIterestRate);
+
     void payInterestOn();
+
     float getInterestRate();
+
     void setInterestRate(float newRate);
 };
 

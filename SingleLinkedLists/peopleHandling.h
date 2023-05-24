@@ -4,5 +4,7 @@
 
 #ifndef C___PEOPLEHANDLING_H
 #define C___PEOPLEHANDLING_H
+
 int peopleHandling();
+
 #endif //C___PEOPLEHANDLING_H

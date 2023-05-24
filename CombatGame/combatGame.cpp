@@ -280,7 +280,7 @@ void copyObjectReferences(list<Player> &sourceList,
 
 int combatGame() {
     filesystem::path fileName =
-            filesystem::current_path().parent_path() / "CombatGame" / "combatGame.dat"; // change file path if necessary
+            filesystem::current_path().parent_path() / "CombatGame" / "combatGame.txt"; // change file path if necessary
     cout
             << "Welcome to Combat Game Management! Do you want to work with persistent storage? Please check and adjust the file path accordingly to your needs"
             << endl << "Current path: " << fileName << endl <<
@@ -489,7 +489,8 @@ void Player::loadFile(list<Player> &playersList, const filesystem::path &fileNam
 }
 
 ostream &operator<<(ostream &os, Player &p) {
-    cout << "Number: " << p.number << " has partecipated in " << p.totalNumberOfRounds << " fights, having awarded " << "("
+    cout << "Number: " << p.number << " has partecipated in " << p.totalNumberOfRounds << " fights, having awarded "
+         << "("
          << p.numWins
          << " x won, " << p.numTies << " x tie) = " << p.totalPoints << " TotalPoints"
          << endl
@@ -617,7 +618,6 @@ int Player::getCurrentGamePoints() const {
 }
 
 bool Player::b_has_greaterPoints(Player a, Player b) {
-    // inspiration taken from https://www.geeksforgeeks.org/stdmin-in-cpp/
     return a.getTotalPoints() < b.getTotalPoints();
 }
 

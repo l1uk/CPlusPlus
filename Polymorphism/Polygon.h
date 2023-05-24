@@ -4,5 +4,7 @@
 
 #ifndef C___POLYGON_H
 #define C___POLYGON_H
+
 int polygon();
+
 #endif //C___POLYGON_H

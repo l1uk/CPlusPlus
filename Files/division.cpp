@@ -24,7 +24,7 @@ int division() {
             if (divisor == 0)
                 throw (string) "Divisor is 0!";
             cout << dividend / divisor << endl;
-            if(outputFile.good())
+            if (outputFile.good())
                 outputFile << dividend << "/" << divisor << " = " << dividend / divisor << endl;
             else
                 throw (string) "Error during file write phase";
@@ -43,8 +43,8 @@ int division() {
 
     cout << "History: " << endl;
 
-    while(!inputFile.eof()){
-        getline(inputFile,row);
+    while (!inputFile.eof()) {
+        getline(inputFile, row);
         cout << row << endl;
     }
 

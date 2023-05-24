@@ -12,12 +12,17 @@ private:
     int accountNumber;
 public:
     Account();
+
     Account(float);
+
     static int accountsCount;
 
     float getBalance();
+
     void deposit(float);
+
     bool withdraw(float);
+
     int getAccountNumber();
 
 };

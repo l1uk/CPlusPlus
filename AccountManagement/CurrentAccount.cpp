@@ -5,7 +5,7 @@
 #include "CurrentAccount.h"
 
 bool CurrentAccount::setPin(int oldPin, int newPin) {
-    if(pin != oldPin){ return false; }
+    if (pin != oldPin) { return false; }
 
     pin = newPin;
 
@@ -16,9 +16,9 @@ bool CurrentAccount::checkPin(int pinToCheck) {
     return pinToCheck == pin;
 }
 
-CurrentAccount::CurrentAccount(float amount) : Account(amount),pin(-1){
+CurrentAccount::CurrentAccount(float amount) : Account(amount), pin(-1) {
 }
 
-CurrentAccount::CurrentAccount() : Account(),pin(-1) {
+CurrentAccount::CurrentAccount() : Account(), pin(-1) {
 
 }
