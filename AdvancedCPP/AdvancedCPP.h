@@ -17,4 +17,6 @@ int rValueReference();
 
 int copyControl();
 
+int lambdaFunc();
+
 #endif //C___ADVANCEDCPP_H

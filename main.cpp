@@ -11,6 +11,6 @@
 
 int main(int argc, char *argv[]) {
     combatGame();
-    //copyControl();
+    //lambdaFunc();
     return 0;
 }
