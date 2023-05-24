@@ -21,16 +21,22 @@ using namespace std;
 //Year of birth
 class Player {
 private:
-    int number, height, weight, yearOfBirth, totalPoints, currentGamePoints, numberOfRounds;
+    int number, height, weight, yearOfBirth, totalPoints, currentGamePoints, numberOfRounds, numWins, numTies, totalNumberOfRounds;
     string name, surname;
 public:
     Player(int number, int height, int weight, int yearOfBirth, int points, int numbersOfRounds, const string &name,
-           const string &surname);
+           const string &surname, int totalNumberOfRounds, int numWins, int NumTies);
 
     Player();
 
     // getters
     int getNumber() const;
+
+    int getNumWins() const;
+
+    int getNumTies() const;
+
+    int getTotalNumberOfRounds() const;
 
     int getHeight() const;
 
@@ -54,7 +60,16 @@ public:
     };
 
     void incrementRoundsCount() {
+        totalNumberOfRounds++;
         numberOfRounds++;
+    }
+
+    void incrementsNumWins() {
+        numWins++;
+    }
+
+    void incrementNumTies() {
+        numTies++;
     }
 
     void resetNumberOfRounds() {
@@ -116,22 +131,33 @@ private:
 public:
     Fight(Player *p1, Player *p2) : p1(p1), p2(p2), winner(nullptr) {}
 
-    void fight() {
-        // fight logic is simple: is player 1 is taller or heavier than player 2, he wins
-        if (*p1 > *p2) {
+    void insertResult() {
+        // prompt the user fot the insertResult result
+
+        cout << "Result: " << endl;
+        cout << "[1] - Player " << p1->getName() << " won & Player " << p2->getName() << "  lost" << endl <<
+             "[2] - Player " << p1->getName() << " lost & Player " << p2->getName() << " won" << endl <<
+             "[3] - Draw ";
+        int choice = Utilities::input_int(1, 3);
+        if (choice == 1) {
             winner = p1;
             p1->addPoints(POINTS_VICTORY);
             p2->addPoints(POINTS_LOSS);
-        } else if (*p1 < *p2) {
+            p1->incrementsNumWins();
+        } else if (choice == 2) {
             winner = p2;
             p1->addPoints(POINTS_LOSS);
             p2->addPoints(POINTS_VICTORY);
+            p2->incrementsNumWins();
         } else {
             p1->addPoints(POINTS_TIE);
             p2->addPoints(POINTS_TIE);
+            p1->incrementNumTies();
+            p2->incrementNumTies();
         }
         p1->incrementRoundsCount();
         p2->incrementRoundsCount();
+
     }
 
     friend ostream &operator<<(ostream &os, Fight &f); // output operator overloading
@@ -141,7 +167,15 @@ ostream &operator<<(ostream &os, Fight &f) {
     cout << "Fight Statistics: " << endl;
     cout << *f.p1 << "VS" << endl << *f.p2 << endl;
     if (f.winner != nullptr) {
-        cout << "Result - Winner: " << *f.winner << endl;
+        Player *loser;
+        f.p1 == f.winner ? loser = f.p2 : loser = f.p1;
+        bool taller = *f.winner >= *loser;
+        bool heavier = *f.winner > *loser;
+        cout << "Player " << f.winner->getName() << " (Number: " << f.winner->getNumber() << ")" << " has won, he is "
+             << abs(f.winner->getHeight() - loser->getHeight())
+             << "cm " << (taller ? "taller" : "shorter") << " and "
+             << abs(f.winner->getWeight() - loser->getWeight()) << "kg " << (heavier ? "heavier" : "lighter")
+             << " than player " << loser->getName() << " (Number: " << loser->getNumber() << ")" << endl;
     } else { cout << "There is no winner! This game ended in a Tie" << endl; }
 
     return os;
@@ -151,7 +185,7 @@ ostream &operator<<(ostream &os, Fight &f) {
 class Game {
     // a Game is made of NUM_PLAYERS players, that are stored in an array
     // for every round, the user is prompted to choose two fighters.
-    // In order for a fight to take place, a Fight object is instantiated and printed.
+    // In order for a insertResult to take place, a Fight object is instantiated and printed.
 public:
     Game(Player **players) {
         for (int i = 0; i < NUM_PLAYERS; i++) {
@@ -176,7 +210,7 @@ public:
                     std::count_if(players.begin(), players.end(),
                                   Player::canPlay); // I.E. that not have been playing the maximum number of battles
 
-            if (players_that_can_play < 2) { // there should at least be 2 players that can join a fight
+            if (players_that_can_play < 2) { // there should at least be 2 players that can join a insertResult
                 cout << "Game over! There are non more players available at the moment." << endl <<
                      "  Note that the maximum number of rounds per player is " << Player::MAX_FIGHTS << endl << endl;
                 Utilities::pauseExec();
@@ -204,7 +238,7 @@ public:
             players.clear();
 
             Fight f(fighter1, fighter2);
-            f.fight();
+            f.insertResult();
             cout << f << endl;
 
             Utilities::pauseExec();
@@ -426,7 +460,8 @@ void Player::saveFile(list<Player> &playersList, const filesystem::path &fileNam
             outputFile << it->getNumber() << "\t" << it->getName() << "\t" << it->getSurname() << "\t"
                        << it->getHeight() << "\t" << it->getWeight() << "\t"
                        << it->getYearOfBirth() << "\t"
-                       << it->getTotalPoints() << "\t" << it->getNumberOfRounds() << endl;
+                       << it->getTotalPoints() << "\t" << it->getNumberOfRounds() << "\t"
+                       << it->getTotalNumberOfRounds() << "\t" << it->getNumWins() << "\t" << it->getNumTies() << endl;
         }
     } else {
         throw (string) "Error during file write!";
@@ -436,12 +471,14 @@ void Player::saveFile(list<Player> &playersList, const filesystem::path &fileNam
 
 void Player::loadFile(list<Player> &playersList, const filesystem::path &fileName) {
     ifstream inputFile(fileName);
-    int number, height, weight, yearOfBirth, points, numberOfFights;
+    int number, height, weight, yearOfBirth, points, numberOfFights, totalNumberOfRounds, numWins, numTies;
     string name, surname;
     if (inputFile.good()) {
-        while (inputFile >> number >> name >> surname >> height >> weight >> yearOfBirth >> points >> numberOfFights) {
+        while (inputFile >> number >> name >> surname >> height >> weight >> yearOfBirth >> points >> numberOfFights
+                         >> totalNumberOfRounds >> numWins >> numTies) {
             playersList.push_back(
-                    Player(number, height, weight, yearOfBirth, points, numberOfFights, name, surname)
+                    Player(number, height, weight, yearOfBirth, points, numberOfFights, name, surname,
+                           totalNumberOfRounds, numWins, numTies)
             );
         }
 
@@ -452,7 +489,9 @@ void Player::loadFile(list<Player> &playersList, const filesystem::path &fileNam
 }
 
 ostream &operator<<(ostream &os, Player &p) {
-    cout << "Number: " << p.number << ", Number of fights: " << p.numberOfRounds << ", Points: " << p.totalPoints
+    cout << "Number: " << p.number << " has partecipated in " << p.totalNumberOfRounds << " fights, having awarded " << "("
+         << p.numWins
+         << " x won, " << p.numTies << " x tie) = " << p.totalPoints << " TotalPoints"
          << endl
          << "\t" << "Name: " << p.name << ", Surname: " << p.surname << ", Weight: " << p.weight
          << "kg, Height: " << p.height << "cm, Birth year: " << p.yearOfBirth << endl;
@@ -471,8 +510,6 @@ istream &operator>>(istream &is, Player &p) {
     p.height = Utilities::input_int(0, numeric_limits<int>::max());
     cout << "Insert weight in Kg: ";
     p.weight = Utilities::input_int(0, numeric_limits<int>::max());
-    cout << "Insert total Points: ";
-    p.totalPoints = Utilities::input_int(0, numeric_limits<int>::max());
     cout << "Insert birth year: ";
     p.yearOfBirth = Utilities::input_int(0, numeric_limits<int>::max());
     return is;
@@ -510,9 +547,19 @@ Player *Player::choosePlayerFromList(list<Player *> &playersList, string prompt)
 }
 
 Player::Player(int number, int height, int weight, int yearOfBirth, int points, int numbersOfRounds, const string &name,
-               const string &surname) : number(number), height(height), weight(weight), yearOfBirth(yearOfBirth),
-                                        totalPoints(points), numberOfRounds(numbersOfRounds), name(name),
-                                        surname(surname) {}
+               const string &surname, int totalNumberOfRounds, int numWins, int numTies) : number(number),
+                                                                                           height(height),
+                                                                                           weight(weight),
+                                                                                           yearOfBirth(yearOfBirth),
+                                                                                           totalPoints(points),
+                                                                                           numberOfRounds(
+                                                                                                   numbersOfRounds),
+                                                                                           name(name),
+                                                                                           surname(surname),
+                                                                                           totalNumberOfRounds(
+                                                                                                   totalNumberOfRounds),
+                                                                                           numWins(numWins),
+                                                                                           numTies(numTies) {}
 
 int Player::getNumber() const {
     return number;
@@ -546,10 +593,11 @@ const string &Player::getSurname() const {
     return surname;
 }
 
-Player::Player() : totalPoints(0), numberOfRounds(0) {}
+Player::Player() : totalPoints(0), numberOfRounds(0), totalNumberOfRounds(0), currentGamePoints(0), numWins(0),
+                   numTies(0) {}
 
 bool Player::operator>(const Player &p) const {
-    return (this->weight > p.weight or this->height > p.height);
+    return (this->weight > p.weight);
 }
 
 bool Player::operator<(const Player &p) const {
@@ -557,11 +605,11 @@ bool Player::operator<(const Player &p) const {
 }
 
 bool Player::operator<=(const Player &p) const {
-    return (*this < p or *this == p);
+    return !(*this >= p);
 }
 
 bool Player::operator>=(const Player &p) const {
-    return (*this > p or *this == p);
+    return (this->height > p.getHeight());
 }
 
 int Player::getCurrentGamePoints() const {
@@ -571,6 +619,18 @@ int Player::getCurrentGamePoints() const {
 bool Player::b_has_greaterPoints(Player a, Player b) {
     // inspiration taken from https://www.geeksforgeeks.org/stdmin-in-cpp/
     return a.getTotalPoints() < b.getTotalPoints();
+}
+
+int Player::getTotalNumberOfRounds() const {
+    return totalNumberOfRounds;
+}
+
+int Player::getNumWins() const {
+    return numWins;
+}
+
+int Player::getNumTies() const {
+    return numTies;
 }
 
 
