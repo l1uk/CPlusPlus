@@ -16,7 +16,7 @@ Vector::Vector(std::initializer_list<double> l) {
     size_t rows = l.size();
     this->data = new double[rows]();
     this->rows_ = rows;
-    std::initializer_list<double>::iterator it = l.begin();
+    std::initializer_list<double>::iterator it;
     int count = 0;
     for (it = l.begin(); it != l.end(); it++) {
         this->data[count++] = *it;
@@ -26,12 +26,13 @@ Vector::Vector(std::initializer_list<double> l) {
 // destructor
 Vector::~Vector() {
     delete[] this->data;
+    this->data = nullptr;
 }
 
 // Copy constructor
 Vector::Vector(const Vector &other) {
     this->rows_ = other.rows_;
-    this->data = new double[this->rows_]();
+    this->data = new double[other.rows_]();
     for (size_t i = 0; i < this->rows_; i++) {
         this->data[i] = other.data[i];
     }
@@ -48,6 +49,7 @@ Vector::Vector(Vector &&other) noexcept {
 Vector &Vector::operator=(const Vector &other) {
     if (this->rows_ != other.rows_) {
         this->rows_ = other.rows_;
+        delete[] this->data;
         this->data = new double[this->rows_]();
     }
     for (size_t i = 0; i < this->rows_; i++) {
@@ -58,6 +60,8 @@ Vector &Vector::operator=(const Vector &other) {
 
 // Move assignment operator
 Vector &Vector::operator=(Vector &&other) noexcept {
+    delete[] this->data;
+    this->data = 0;
     this->rows_ = other.rows_;
     this->data = other.data;
     other.data = 0;
@@ -65,11 +69,7 @@ Vector &Vector::operator=(Vector &&other) noexcept {
 }
 
 void swap(Vector &a, Vector &b) {
-    Vector tmp = a;
-    for (size_t i = 0; i < a.rows_; i++) {
-        a[i] = b[i];
-        b[i] = tmp[i];
-    }
+    std::swap(a, b);
 }
 
 bool Vector::operator==(const Vector &b) const {
@@ -91,65 +91,84 @@ bool Vector::operator!=(const Vector &b) const {
 }
 
 Vector &Vector::operator+=(const Vector &b) {
-    //FIXME
+    assert(this->size() == b.size());
+    for (size_t i = 0; i < this->rows_; i++) {
+        this->data[i] = this->data[i] + b.data[i];
+    }
     return *this;
 }
 
 Vector Vector::operator+(const Vector &b) const {
-    //FIXME
-    return *this;
+    Vector ret(*this);
+    ret += b;
+    return ret;
 }
 
 Vector &Vector::operator-=(const Vector &b) {
-    //FIXME
+    assert(this->size() == b.size());
+    for (size_t i = 0; i < this->rows_; i++) {
+        this->data[i] = this->data[i] - b.data[i];
+    }
     return *this;
 }
 
 Vector Vector::operator-(const Vector &b) const {
-    //FIXME
-    return *this;
+    Vector ret(*this);
+    ret -= b;
+    return ret;
 }
 
 Vector Vector::operator*(const Vector &b) const {
-    //FIXME
-    return *this;
+    Vector ret(*this);
+    ret *= b;
+    return ret;
 }
 
 Vector &Vector::operator*=(const Vector &b) {
-    //FIXME
+    assert(this->size() == b.size());
+    for (size_t i = 0; i < this->rows_; i++) {
+        this->data[i] = this->data[i] * b.data[i];
+    }
     return *this;
 }
 
 // print matrixelements to stream
 std::ostream &operator<<(std::ostream &outputStream, const Vector &m) {
-    //FIXME
+    for (size_t i = 0; i < m.rows_; i++) {
+        outputStream << m.data[i];
+        if (i != m.rows_ - 1) {
+            outputStream << "   ";
+        }
+    }
     return outputStream;
 }
 
 // read matrixelements from stream
 std::istream &operator>>(std::istream &inputStream, Vector &m) {
-    //FIXME
+    for (size_t i = 0; i < m.rows_; i++) {
+        if (!(inputStream >> m.data[i])) {
+            throw new std::runtime_error("Error in double parsing!");
+        }
+    }
     return inputStream;
 }
 
 double *Vector::begin() {
-    // return &this->data[0];
-    return nullptr;
+    return this->data;
 }
 
 double *Vector::end() {
-    // return &this->data[this->rows_];
-    return nullptr;
+    return this->data + this->rows_;
 }
 
 const double *Vector::begin() const {
-    // return begin();
-    return nullptr;
+    const double *ret = this->data;
+    return ret;
 }
 
 const double *Vector::end() const {
-    // return end();
-    return nullptr;
+    const double *ret = this->data + this->rows_;
+    return ret;
 }
 
 size_t Vector::size() const {
@@ -157,6 +176,6 @@ size_t Vector::size() const {
 }
 
 double Vector::dot(const Vector &b) const {
-    //return std::accumulate(this->begin(), this->end(), 0);
-    return 0;
+    Vector a_mul_b = *this * b; // product of two vectors
+    return std::accumulate(a_mul_b.begin(), a_mul_b.end(), (double) 0.0, std::plus<double>()); // sum of products
 }
