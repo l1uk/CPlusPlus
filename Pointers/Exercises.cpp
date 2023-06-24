@@ -32,7 +32,6 @@ void incrementEachByOne(int *arrayStart, int *arrayEnd) {
 
 int arrayModificationExercise() {
     int numbers[] = {10, 20, 30};
-
     incrementEachByOne(numbers, numbers + 2);
 
     cout << numbers[0];

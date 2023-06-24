@@ -13,4 +13,6 @@ int dateEx();
 
 int rockPaperScrissors();
 
+int complex_ex();
+
 #endif //C___OVERLOADING_H

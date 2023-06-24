@@ -8,9 +8,11 @@
 #include "Templates/Templates.h"
 #include "CombatGame/combatGame.h"
 #include "AdvancedCPP/AdvancedCPP.h"
+#include "Exam2406/exam.h"
 
 int main(int argc, char *argv[]) {
-    combatGame();
+    //combatGame();
     //lambdaFunc();
+    matrix();
     return 0;
 }
