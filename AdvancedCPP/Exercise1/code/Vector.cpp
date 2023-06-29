@@ -3,8 +3,7 @@
 Vector::Vector(size_t rows, double initValue) {
     this->data = new double[rows]();
     this->rows_ = rows;
-    for (size_t i = 0; i < rows; i++)
-        this->data[i] = initValue;
+    std::fill(this->data, this->data + this->rows_, initValue);
 }
 
 Vector::Vector(size_t rows) {
@@ -16,11 +15,7 @@ Vector::Vector(std::initializer_list<double> l) {
     size_t rows = l.size();
     this->data = new double[rows]();
     this->rows_ = rows;
-    std::initializer_list<double>::iterator it;
-    int count = 0;
-    for (it = l.begin(); it != l.end(); it++) {
-        this->data[count++] = *it;
-    }
+    std::copy(l.begin(), l.end(), this->data);
 }
 
 // destructor
@@ -33,15 +28,13 @@ Vector::~Vector() {
 Vector::Vector(const Vector &other) {
     this->rows_ = other.rows_;
     this->data = new double[other.rows_]();
-    for (size_t i = 0; i < this->rows_; i++) {
-        this->data[i] = other.data[i];
-    }
+    std::copy(other.data, other.data + other.rows_, this->data);
 }
 
 // Move constructor
 Vector::Vector(Vector &&other) noexcept {
-    this->rows_ = other.rows_;
-    this->data = other.data;
+    this->rows_ = std::move(other.rows_);
+    this->data = std::move(other.data);
     other.data = 0;
 }
 
