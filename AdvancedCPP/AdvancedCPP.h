@@ -19,4 +19,26 @@ int copyControl();
 
 int lambdaFunc();
 
+int allocator();
+
+int cycle();
+
+int cycleBreak();
+
+int useCount();
+
+int chrono();
+
+int random();
+
+int email();
+
+int replace();
+
+int regex();
+
+int variadicTemplates();
+
+int CoRoutines();
+
 #endif //C___ADVANCEDCPP_H

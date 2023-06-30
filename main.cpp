@@ -13,6 +13,6 @@
 int main(int argc, char *argv[]) {
     //combatGame();
     //lambdaFunc();
-    matrix();
+    CoRoutines();
     return 0;
 }
