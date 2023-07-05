@@ -21,8 +21,6 @@ Vector<T>::Vector(Vector &&s) noexcept :
 // take over resources from s
         elements(s.elements), first_free(s.first_free), cap(s.cap) { // move constructor
     // leave s in a state in which it is safe to run the destructor
-    // Fixme
-    //s.free();
     s.elements = s.cap = s.first_free = 0;
 
 }
@@ -31,10 +29,7 @@ template<typename T>
 inline
 Vector<T>::Vector(const Vector &s) {
     // call copy to allocate exactly as many elements as in s
-    // Fixme
     auto data = alloc_n_copy(s.begin(), s.end());
-//here
-    //free();
 
     elements = data.first;
     first_free = cap = data.second;
@@ -43,13 +38,13 @@ Vector<T>::Vector(const Vector &s) {
 template<typename T>
 inline
 void Vector<T>::free() {
-    // Fixme
     // destroy the old elements in reverse order
     for (int i = capacity() - 1; i >= 0; i--) {
         std::allocator_traits<decltype(alloc)>::destroy(alloc, &elements[i]);
     }
     // deallocate (cannot be called on a 0 pointer)
-    alloc.deallocate(elements, capacity());
+    if (elements != 0)
+        alloc.deallocate(elements, capacity());
 
     elements = first_free = cap = 0;
 
@@ -73,7 +68,6 @@ Vector<T> &Vector<T>::operator=(std::initializer_list<T> il) {
 template<typename T>
 inline
 Vector<T> &Vector<T>::operator=(Vector &&rhs) noexcept {
-    // Fixme
     elements = std::move(rhs.elements);
     cap = std::move(rhs.cap);
     first_free = std::move(rhs.first_free);
@@ -84,7 +78,6 @@ Vector<T> &Vector<T>::operator=(Vector &&rhs) noexcept {
 template<typename T>
 inline
 Vector<T> &Vector<T>::operator=(const Vector &rhs) {
-    // Fixme
     auto data = alloc_n_copy(rhs.begin(), rhs.end());
 
     free();
@@ -98,7 +91,6 @@ Vector<T> &Vector<T>::operator=(const Vector &rhs) {
 template<typename T>
 inline
 void Vector<T>::reallocate() {
-    // Fixme
     // we'll allocate space for twice as many elements as current size or 2 if size == 0
     int old_capacity = capacity();
     int alloc_size = old_capacity > 0 ? old_capacity * 2 : 2;
@@ -122,7 +114,6 @@ template<typename T>
 inline
 void Vector<T>::push_back(const T &s) {
     chk_n_alloc(); // reallocates the Vector if necessary
-    // Fixme
     // construct a copy "s" in the element to which first_free points
     std::allocator_traits<decltype(alloc)>::construct(alloc, first_free, s);// construct the copy
     first_free += 1;

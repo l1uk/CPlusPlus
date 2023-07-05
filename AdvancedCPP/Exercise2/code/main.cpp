@@ -38,13 +38,11 @@ bool equal(const Vector<T> &a, const Vector<T> &b) {
 
 
     for (size_t i = 0; i < a.size(); ++i) {
-        //cout << a[i] << "  " << b[i] << endl;
         if (a[i] != b[i])
             return false;
 
 
     }
-    cout << endl;
     return true;
 }
 
