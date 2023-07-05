@@ -1,0 +1,7 @@
+5	John	Smith	175	82	1972	10	1	3	1	0
+2	David	Gotterneim	190	88	2004	10	1	1	1	0
+3	Leonel	Lennon	170	60	2007	0	0	0	0	0
+6	Leslie	McConnor	172	50	2001	25	0	3	2	1
+1	Marie	Steher	180	78	2001	0	0	1	0	0
+10	Luke	Graham	188	87	2974	5	0	3	0	1
+4	Sheila	OConnor	165	90	1975	10	1	1	1	0
