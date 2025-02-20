@@ -28,7 +28,7 @@ jobs:
       - name: Run Cppcheck Analysis
         run: |
           mkdir -p security_reports
-          cppcheck vulnerable-source-code --enable=all --inconclusive --quiet --xml 2> security_reports/report.xml || true
+          cppcheck . --enable=all --inconclusive --quiet --xml 2> security_reports/report.xml || true
 
       - name: Convert XML to SARIF
         uses: Flast/cppcheck-sarif@v2
