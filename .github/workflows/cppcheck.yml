@@ -1,0 +1,43 @@
+name: Cppcheck
+
+on:
+  # Scan changed files in PRs (diff-aware scanning):
+  pull_request: {}
+  # Scan on-demand through GitHub Actions interface:
+  workflow_dispatch: {}
+  # Scan mainline branches and report all findings:
+  push:
+    branches: ["master", "main"]
+
+jobs:
+  cppcheck_scan:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Cppcheck
+        run: |
+          sudo apt update && sudo apt install -y cppcheck
+
+      - name: Run Cppcheck Analysis
+        run: |
+          mkdir -p security_reports
+          cppcheck vulnerable-source-code --enable=all --inconclusive --quiet --xml 2> security_reports/report.xml || true
+
+      - name: Convert XML to SARIF
+        uses: Flast/cppcheck-sarif@v2
+        with:
+          input: security_reports/report.xml
+          output: security_reports/report.sarif
+
+      - name: Upload SARIF Report to GitHub Security Dashboard
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: security_reports/report.sarif
+          category: cppcheck
